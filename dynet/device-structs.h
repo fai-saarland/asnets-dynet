@@ -18,11 +18,11 @@ struct ComputationGraph; // TODO is there a nicer way to resolve this cyclic dep
 struct Tensor;
 
 struct DeviceMempoolSizes {
-  size_t used[4];
+  size_t used[4]{};
   DeviceMempoolSizes() = default;
-  DeviceMempoolSizes(size_t total_s);
+  explicit DeviceMempoolSizes(size_t total_s);
   DeviceMempoolSizes(size_t fxs_s, size_t dEdfs_s, size_t ps_s, size_t sc_s);
-  DeviceMempoolSizes(const std::string & descriptor);
+  explicit DeviceMempoolSizes(const std::string & descriptor);
 };
 
 }

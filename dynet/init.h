@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#define DYNET_SUPPORT_REINITIALIZATION
+
 namespace dynet {
 
 extern float default_weight_decay_lambda;
@@ -28,6 +30,7 @@ struct DynetParams {
   bool cpu_requested; /**< CPU requested in multi-device case */
   int requested_gpus; /**< Number of requested GPUs */
   std::vector<int> gpu_mask; /**< List of required GPUs by ids */
+  bool verbose; /**< Be more verbose */
 };
 
 DynetParams extract_dynet_params(int& argc, char**& argv, bool shared_parameters = false);

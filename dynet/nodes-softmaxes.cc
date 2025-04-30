@@ -4,6 +4,8 @@
 #include "dynet/nodes-impl-macros.h"
 #include "dynet/functors.h"
 
+#include <cassert>
+
 using namespace std;
 
 namespace dynet {

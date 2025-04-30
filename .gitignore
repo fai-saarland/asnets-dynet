@@ -1,4 +1,5 @@
 # cmake stuff
+cmake-build*
 build*/
 Testing/
 dynet/Testing/
@@ -52,6 +53,7 @@ rnnlm/ptb-mikolov/
 
 # Editor stuff
 *.swp
+.idea
 
 # Doc stuff
 doc/doxygen/xml

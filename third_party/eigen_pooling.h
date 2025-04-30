@@ -13,6 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
+// Jan Eisenhut: Change Eigen::divup to Eigen::numext::div_ceil to avoid
+// deprecation warning
+
 #ifndef THIRD_PARTY_TENSORFLOW_CORE_KERNELS_EIGEN_POOLING_H_
 #define THIRD_PARTY_TENSORFLOW_CORE_KERNELS_EIGEN_POOLING_H_
 
@@ -98,16 +101,16 @@ SpatialMaxPooling(const Input& input, DenseIndex patchRows,
       post_reduce_dims;
   post_reduce_dims[0] = in.dimension(0);
   if (padding_type == PADDING_VALID) {
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)) - patchRowsEff + 1,
         strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)) - patchColsEff + 1,
         strideCols);
   } else {
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)), strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)), strideCols);
   }
   post_reduce_dims[3] = in.dimension(3);
@@ -211,21 +214,21 @@ CuboidMaxPooling(const Input& input, DenseIndex patchPlanes,
       post_reduce_dims;
   post_reduce_dims[0] = in.dimension(0);
   if (padding_type == PADDING_VALID) {
-    post_reduce_dims[idxPlanes] = Eigen::divup(
+    post_reduce_dims[idxPlanes] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxPlanes)) - patchPlanes + 1,
         stridePlanes);
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)) - patchRows + 1,
         strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)) - patchCols + 1,
         strideCols);
   } else {
-    post_reduce_dims[idxPlanes] = Eigen::divup(
+    post_reduce_dims[idxPlanes] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxPlanes)), stridePlanes);
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)), strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)), strideCols);
   }
   post_reduce_dims[4] = in.dimension(4);
@@ -447,16 +450,16 @@ SpatialAvgPooling(const Input& input, DenseIndex patchRows,
       post_reduce_dims;
   post_reduce_dims[0] = in.dimension(0);
   if (padding_type == PADDING_VALID) {
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)) - patchRowsEff + 1,
         strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)) - patchColsEff + 1,
         strideCols);
   } else {
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)), strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)), strideCols);
   }
   post_reduce_dims[3] = in.dimension(3);
@@ -560,21 +563,21 @@ CuboidAvgPooling(const Input& input, DenseIndex patchPlanes,
       post_reduce_dims;
   post_reduce_dims[0] = in.dimension(0);
   if (padding_type == PADDING_VALID) {
-    post_reduce_dims[idxPlanes] = Eigen::divup(
+    post_reduce_dims[idxPlanes] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxPlanes)) - patchPlanes + 1,
         stridePlanes);
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)) - patchRows + 1,
         strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)) - patchCols + 1,
         strideCols);
   } else {
-    post_reduce_dims[idxPlanes] = Eigen::divup(
+    post_reduce_dims[idxPlanes] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxPlanes)), stridePlanes);
-    post_reduce_dims[idxRows] = Eigen::divup(
+    post_reduce_dims[idxRows] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxRows)), strideRows);
-    post_reduce_dims[idxCols] = Eigen::divup(
+    post_reduce_dims[idxCols] = Eigen::numext::div_ceil(
         static_cast<DenseIndex>(in.dimension(idxCols)), strideCols);
   }
   post_reduce_dims[4] = in.dimension(4);

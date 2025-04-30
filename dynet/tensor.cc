@@ -133,9 +133,11 @@ float TensorTools::access_element(const Tensor& v, int index) {
   return ret;
 }
 
+// TODO Jan: check bugfix
 float TensorTools::access_element(const Tensor& v, const Dim& index) {
   if (v.device->type == DeviceType::CPU) {
-    return mat(v)(index[0], index[1]);
+      return mat(v)(index[0], index[1]);
+  }
 #if HAVE_CUDA
   if (v.device->type == DeviceType::GPU) {
     float ret = 0.0f;
@@ -143,7 +145,7 @@ float TensorTools::access_element(const Tensor& v, const Dim& index) {
     return ret;
   }
 #endif
-  } else { throw std::runtime_error("Bad device type"); }
+  else { throw std::runtime_error("Bad device type"); }
   return 0;
 }
 

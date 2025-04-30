@@ -2,7 +2,7 @@
 #define DYNET_TENSOR_EIGEN_H
 
 // This file includes all of the DyNet tensor functions that require
-// Eigen to be importet.d. 
+// Eigen to be imported.
 
 #include "dynet/tensor.h"
 

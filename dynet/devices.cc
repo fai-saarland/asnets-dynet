@@ -1,3 +1,6 @@
+/// Update by Jan Eisenhut:
+/// Implement Device Destructors for CPU device
+
 #include "dynet/devices.h"
 
 #include <iostream>
@@ -15,7 +18,7 @@ using namespace std;
 namespace dynet {
 
 DeviceMempoolSizes::DeviceMempoolSizes(size_t total_size) {
-  DYNET_ARG_CHECK(total_size > 0, "Attempt to allocate memory of size 0 in DeviceMempoolSizes");
+  DYNET_ARG_CHECK(total_size > 0, "Attempt to allocate memory of size 0 in DeviceMempoolSizes")
   if (total_size < 4) {
     used[0] = used[1] = used[2] = used[3] = 1;
   } else {
@@ -37,7 +40,7 @@ DeviceMempoolSizes::DeviceMempoolSizes(const std::string & descriptor) {
   vector<string> strs = str_split(descriptor, ',');
   if (strs.size() == 1) {
     size_t total_size = stoi(strs[0]);
-    DYNET_ARG_CHECK(total_size > 0, "Attempt to allocate memory of size 0 in DeviceMempoolSizes");
+    DYNET_ARG_CHECK(total_size > 0, "Attempt to allocate memory of size 0 in DeviceMempoolSizes")
     if (total_size < 4) {
       used[0] = used[1] = used[2] = used[3] = 1;
     } else {
@@ -52,38 +55,38 @@ DeviceMempoolSizes::DeviceMempoolSizes(const std::string & descriptor) {
     used[2] = stoi(strs[2]);
     used[3] = stoi(strs[3]);
   } else {
-    DYNET_INVALID_ARG("the format of --dynet-mem is invalid: " << descriptor);
+    DYNET_INVALID_ARG("the format of --dynet-mem is invalid: " << descriptor)
   }
 }
 
-Device::~Device() {}
+Device::~Device() noexcept(false) = default;
 
 DeviceMempoolSizes Device::mark(ComputationGraph *cg) {
   cg->incremental_forward({cg, (VariableIndex)(cg->nodes.size() - 1)}); // needed so that we actually allocate the needed memory
   // for all existing nodes.
-  return DeviceMempoolSizes(pools[0]->used(), pools[1]->used(), pools[2]->used(), pools[3]->used());
+  return {pools[0]->used(), pools[1]->used(), pools[2]->used(), pools[3]->used()};
 }
 
 void Device::revert(const DeviceMempoolSizes & cp) {
   if(cp.used[0] > pools[0]->used())
-    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[0] << " > " << pools[0]->used() << ")");
+    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[0] << " > " << pools[0]->used() << ")")
   pools[0]->set_used(cp.used[0]);
   if(cp.used[1] > pools[1]->used())
-    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[1] << " > " << pools[1]->used() << ")");
+    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[1] << " > " << pools[1]->used() << ")")
   pools[1]->set_used(cp.used[1]);
   if(cp.used[2] > pools[2]->used())
-    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[2] << " > " << pools[2]->used() << ")");
+    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[2] << " > " << pools[2]->used() << ")")
   pools[2]->set_used(cp.used[2]);
   if(cp.used[3] > pools[3]->used())
-    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[3] << " > " << pools[3]->used() << ")");
+    DYNET_INVALID_ARG("Saved value greater than original value in Device::revert (" << cp.used[3] << " > " << pools[3]->used() << ")")
   pools[3]->set_used(cp.used[3]);
 }
 
 void Device::allocate_tensor(DeviceMempool mp, Tensor & tens) {
-  DYNET_ASSERT(mp != DeviceMempool::NONE, "Attempt to allocate tensor for NONE DeviceMempool");
-  DYNET_ASSERT(pools[(int)mp] != nullptr, "Attempt to allocate tensor for null DeviceMempool");
+  DYNET_ASSERT(mp != DeviceMempool::NONE, "Attempt to allocate tensor for NONE DeviceMempool")
+  DYNET_ASSERT(pools[(int)mp] != nullptr, "Attempt to allocate tensor for null DeviceMempool")
   tens.v = (float*)pools[(int)mp]->allocate(tens.d.size() * sizeof(float));
-  DYNET_ASSERT(tens.v != nullptr, "Allocated tensor is zero");
+  DYNET_ASSERT(tens.v != nullptr, "Allocated tensor is zero")
   tens.mem_pool = mp;
 }
 
@@ -94,16 +97,16 @@ Device_GPU::Device_GPU(int my_id, const DeviceMempoolSizes & mbs,
   CUDA_CHECK(cudaSetDevice(device_id));
   CUBLAS_CHECK(cublasCreate(&cublas_handle));
   CUBLAS_CHECK(cublasSetPointerMode(cublas_handle, CUBLAS_POINTER_MODE_DEVICE));
-  reset_rng(seed);
+  Device_GPU::reset_rng(seed);
 #if HAVE_CUDNN
   CUDNN_CHECK(cudnnCreate(&cudnnHandle));
 #endif
-  kSCALAR_MINUSONE = (float*)gpu_mem.malloc(sizeof(float));
+  kSCALAR_MINUS_ONE = (float*)gpu_mem.malloc(sizeof(float));
   kSCALAR_ONE = (float*)gpu_mem.malloc(sizeof(float));
   kSCALAR_ZERO = (float*)gpu_mem.malloc(sizeof(float));
   name = "GPU:" + std::to_string(device_id);
   float minusone = -1;
-  CUDA_CHECK(cudaMemcpyAsync(kSCALAR_MINUSONE, &minusone, sizeof(float), cudaMemcpyHostToDevice));
+  CUDA_CHECK(cudaMemcpyAsync(kSCALAR_MINUS_ONE, &minusone, sizeof(float), cudaMemcpyHostToDevice));
   float one = 1;
   CUDA_CHECK(cudaMemcpyAsync(kSCALAR_ONE, &one, sizeof(float), cudaMemcpyHostToDevice));
   float zero = 0;
@@ -120,26 +123,35 @@ Device_GPU::Device_GPU(int my_id, const DeviceMempoolSizes & mbs,
   pools[3] = new AlignedMemoryPool("GPU scratch memory", (mbs.used[3] << 20), &gpu_mem);
 }
 
-Device_GPU::~Device_GPU()
+Device_GPU::~Device_GPU() noexcept(false)
 {
+  for (auto pool : pools) delete pool;
+  delete edevice;
+  delete estream;
+  // freeing this results in segmentation fault
+  //free(kSCALAR_MINUSONE);
+  //free(kSCALAR_ONE);
+  //free(kSCALAR_ZERO);
 #if HAVE_CUDNN
-  CUDNN_CHECK(cudnnDestroy(cudnnHandle));
+    CUDNN_CHECK(cudnnDestroy(cudnnHandle));
 #endif
+    CURAND_CHECK(curandDestroyGenerator(curandeng));
+    CUBLAS_CHECK(cublasDestroy(cublas_handle));
+    CUDA_CHECK(cudaDeviceReset());
 }
 
 void Device_GPU::reset_rng(unsigned seed) {
-  CURAND_CHECK(curandCreateGenerator(&curandeng,
-                                     CURAND_RNG_PSEUDO_PHILOX4_32_10));
-  CURAND_CHECK(curandSetPseudoRandomGeneratorSeed(curandeng,
-                                                  seed + 1));
+    // TODO Jan: Is the old one cleaned up?
+  CURAND_CHECK(curandCreateGenerator(&curandeng,CURAND_RNG_PSEUDO_PHILOX4_32_10));
+  CURAND_CHECK(curandSetPseudoRandomGeneratorSeed(curandeng,seed + 1));
 }
 #endif
 
 Device_CPU::Device_CPU(int my_id, const DeviceMempoolSizes & mbs, bool shared) :
   Device(my_id, DeviceType::CPU, &cpu_mem), shmem(mem) {
   if (shared) shmem = new SharedAllocator();
-  kSCALAR_MINUSONE = (float*) mem->malloc(sizeof(float));
-  *kSCALAR_MINUSONE = -1;
+  kSCALAR_MINUS_ONE = (float*) mem->malloc(sizeof(float));
+  *kSCALAR_MINUS_ONE = -1;
   kSCALAR_ONE = (float*) mem->malloc(sizeof(float));
   *kSCALAR_ONE = 1;
   kSCALAR_ZERO = (float*) mem->malloc(sizeof(float));
@@ -156,20 +168,25 @@ Device_CPU::Device_CPU(int my_id, const DeviceMempoolSizes & mbs, bool shared) :
   pools[3] = new AlignedMemoryPool("CPU scratch memory", (mbs.used[3] << 20), &cpu_mem);
 }
 
-Device_CPU::~Device_CPU() {}
+Device_CPU::~Device_CPU() {
+  for (auto pool : pools) delete pool;
+  delete edevice;
+  free(kSCALAR_MINUS_ONE);
+  free(kSCALAR_ONE);
+  free(kSCALAR_ZERO);
+}
 
 
-DeviceManager::DeviceManager() {}
+DeviceManager::DeviceManager() = default;
 
 DeviceManager::~DeviceManager() {
   clear();
 }
 
 void DeviceManager::clear() {
-  // TODO: Devices cannot be deleted at the moment because the destructor
-  // is protected
-  // for(Device* device : devices) delete device;
+  for(Device* device : devices) delete device;
   devices.clear();
+  devices_map.clear();
 }
 
 void DeviceManager::add(Device* d) {
@@ -178,7 +195,7 @@ void DeviceManager::add(Device* d) {
 }
 
 Device* DeviceManager::get_global_device(const std::string & name) {
-  if (name == "") {
+  if (name.empty()) {
     if (!dynet::default_device) {
       throw std::runtime_error("Default device does not exist");
     }
@@ -191,11 +208,12 @@ Device* DeviceManager::get_global_device(const std::string & name) {
   return it->second;
 }
 
+// TODO Jan: Check this
 DeviceManager* get_device_manager() {
   // In C++11, initialization of function local static objects is
   // thread safe.
   // See https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
-  static auto device_manager = new DeviceManager;
+  static auto device_manager{new DeviceManager};
   return device_manager;
 }
 

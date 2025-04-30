@@ -477,14 +477,14 @@ void ParameterCollection::reset_gradient() {
 
 size_t ParameterCollection::parameter_count() const {
   size_t r = 0;
-  for (const std::shared_ptr<ParameterStorageBase> param : get_storage().all_params)
+  for (const std::shared_ptr<ParameterStorageBase>& param : get_storage().all_params)
     r += param->size();
   return r;
 }
 
 size_t ParameterCollection::updated_parameter_count() const {
   size_t r = 0;
-  for (const std::shared_ptr<ParameterStorageBase> param : get_storage().all_params)
+  for (const std::shared_ptr<ParameterStorageBase>& param : get_storage().all_params)
     if(param->is_updated())
       r += param->size();
   return r;

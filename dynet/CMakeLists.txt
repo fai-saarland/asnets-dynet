@@ -260,9 +260,19 @@ if(WITH_CUDA_BACKEND)
   set(CUDA_SEPARABLE_COMPILATION ON)
 
   if(CUDA_ARCH)
-    list(APPEND CUDA_NVCC_FLAGS "-arch=sm_${CUDA_ARCH};-std=c++11;-DVERBOSE;-DEIGEN_USE_GPU;-DHAVE_CUDA;-D_FORCE_INLINES")
+    list(APPEND CUDA_NVCC_FLAGS "\
+-arch=sm_${CUDA_ARCH};\
+-diag-suppress=68;-diag-suppress=186;-diag-suppress=20208;\
+-std=c++14;--expt-relaxed-constexpr;--dopt=on;-DNODEBUG;\
+-DVERBOSE;-DEIGEN_USE_GPU;-DHAVE_CUDA;-D_FORCE_INLINES")
   else()
-    list(APPEND CUDA_NVCC_FLAGS "-gencode;arch=compute_30,code=sm_30;-gencode;arch=compute_35,code=sm_35;-gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_52,code=sm_52;-gencode;arch=compute_52,code=compute_52;-std=c++11;-DVERBOSE;-DEIGEN_USE_GPU;-DHAVE_CUDA;-D_FORCE_INLINES")
+    list(APPEND CUDA_NVCC_FLAGS "\
+-gencode;arch=compute_60,code=sm_60;\
+-gencode;arch=compute_70,code=sm_70;\
+-gencode;arch=compute_80,code=sm_80;\
+-diag-suppress=68;-diag-suppress=186;-diag-suppress=20208;\
+-std=c++14;--expt-relaxed-constexpr;--dopt=on;-DNODEBUG;\
+-DVERBOSE;-DEIGEN_USE_GPU;-DHAVE_CUDA;-D_FORCE_INLINES")
   endif()
   if(CUDNN_FOUND)
     list(APPEND CUDA_NVCC_FLAGS "-DHAVE_CUDNN")

@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(dynet)
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
@@ -66,7 +66,7 @@ if(NOT DEFINED GPU_NUMFILES)
   if(MSVC)
     set(GPU_NUMFILES 1)   # MSVC does serial compilation of CUDA, so minimize overhead
   else()
-    set(GPU_NUMFILES 4)   # Should probably be set to number of jobs in parallel make
+    set(GPU_NUMFILES 7)   # Should probably be set to number of jobs in parallel make
   endif()
 endif()
 
@@ -77,14 +77,16 @@ if(WIN32)
 elseif(APPLE AND (${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm.*" OR ${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64.*"))
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=apple-m1")   # Clang on ARM-based Macs does not support -march=native
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 endif()
 
 ######## Compiler-specific options
 if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W1 /MP")   # -Wall produces 20k warnings. Enable parallel compilation
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fno-finite-math-only -Wall -Wno-missing-braces -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fno-finite-math-only -Wall \
+  -Wno-missing-braces -Wno-sign-compare -Wno-ignored-attributes -Wno-array-bounds -Wno-deprecated-enum-enum-conversion \
+  -std=c++14")
 
   if (NOT RELEASE_OPT_LEVEL)
     set(RELEASE_OPT_LEVEL "fast")
@@ -160,6 +162,10 @@ elseif(BACKEND MATCHES "^cuda$")
 else()
   message(SEND_ERROR "BACKEND must be eigen or cuda")
 endif()
+
+if (WITH_EIGEN_BACKEND)
+  add_compile_definitions(EIGEN_NO_CUDA)
+endif ()
 
 if (WITH_CUDA_BACKEND)
   find_package(CUDA REQUIRED)

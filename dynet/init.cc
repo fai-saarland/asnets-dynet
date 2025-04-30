@@ -21,16 +21,15 @@ using namespace std;
 namespace dynet {
 
 DynetParams::DynetParams() : random_seed(0), mem_descriptor("512"), weight_decay(0), autobatch(0), profiling(0),
-  shared_parameters(false), ngpus_requested(false), ids_requested(false), cpu_requested(false), requested_gpus(-1)
+  shared_parameters(false), ngpus_requested(false), ids_requested(false), cpu_requested(false), requested_gpus(-1),
+  verbose(true)
 {
 #if HAVE_CUDA
   gpu_mask = std::vector<int>(MAX_GPUS, 0);
 #endif
 }
 
-DynetParams::~DynetParams()
-{
-}
+DynetParams::~DynetParams() = default;
 
 static bool has_arg(int argi, int argc, char** argv) {
   const std::string arg(argv[argi]);
@@ -214,7 +213,7 @@ DynetParams extract_dynet_params(int& argc,
 
   return params;
 }
-
+/// Changed by Jan Eisenhut: output
 void initialize(DynetParams& params) {
   if (default_device != nullptr) {
     cerr << "WARNING: Attempting to initialize dynet twice. Ignoring duplicate initialization." << endl;
@@ -227,7 +226,7 @@ void initialize(DynetParams& params) {
   vector<Device*> gpudevices;
 #if HAVE_CUDA
   if (!(params.cpu_requested && (params.requested_gpus == -1))) {
-    cerr << "[dynet] initializing CUDA\n";
+    cout << "[dynet] initializing CUDA\n";
     gpudevices = initialize_gpu(params);
     for (auto gpu : gpudevices)
       device_manager->add(gpu);
@@ -239,7 +238,7 @@ void initialize(DynetParams& params) {
     random_device rd;
     params.random_seed = rd();
   }
-  cerr << "[dynet] random seed: " << params.random_seed << endl;
+  if(params.verbose) cout << "[dynet] random seed: " << params.random_seed << endl;
   reset_rng(params.random_seed);
 
   // Set weight decay rate
@@ -248,23 +247,21 @@ void initialize(DynetParams& params) {
   default_weight_decay_lambda = params.weight_decay;
 
   // Set autobatch
-  if(params.autobatch)
-    cerr << "[dynet] using autobatching" << endl;
+  if(params.autobatch && params.verbose) cout << "[dynet] using autobatching" << endl;
   autobatch_flag = params.autobatch;
   
-  if(params.profiling)
-    cerr << "[dynet] using profiling level " << params.profiling << endl;
+  if(params.profiling && params.verbose) cout << "[dynet] using profiling level " << params.profiling << endl;
   profiling_flag = params.profiling;
 
   // Allocate memory
-  cerr << "[dynet] allocating memory: " << params.mem_descriptor << "MB\n";
+  if (params.verbose) cout << "[dynet] allocating memory: " << params.mem_descriptor << "MB\n";
   int default_index = 0;
 
   Device *d;
   if (gpudevices.size()) {
-    d = new Device_CPU(device_manager->num_devices(), std::string("128"), params.shared_parameters);
+    d = new Device_CPU(device_manager->num_devices(), DeviceMempoolSizes(std::string("128")), params.shared_parameters);
   } else {
-    d = new Device_CPU(device_manager->num_devices(), params.mem_descriptor, params.shared_parameters);
+    d = new Device_CPU(device_manager->num_devices(), DeviceMempoolSizes(params.mem_descriptor), params.shared_parameters);
   }
   device_manager->add(d);
   default_device = device_manager->get(default_index);
@@ -276,11 +273,10 @@ void initialize(DynetParams& params) {
 #endif
 
   // TODO these should be accessed through the relevant device and removed here
-  kSCALAR_MINUSONE = default_device->kSCALAR_MINUSONE;
+  kSCALAR_MINUSONE = default_device->kSCALAR_MINUS_ONE;
   kSCALAR_ONE = default_device->kSCALAR_ONE;
   kSCALAR_ZERO = default_device->kSCALAR_ZERO;
-  cerr << "[dynet] memory allocation done.\n";
-
+  if(params.verbose) cout << "[dynet] memory allocation done.\n";
 }
 
 void initialize(int& argc, char**& argv, bool shared_parameters) {
