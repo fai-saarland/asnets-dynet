@@ -1,13 +1,16 @@
+# Note
+
+This repository contains the changes in the Dynamic Neural Network (DyNet) Toolkit used in the ASNets implementation used in the ICAPS'25 paper "On Picking Good Policies: Leveraging Action-Policy Testing in Policy Training" by J. Eisenhut, D. Fišer, I. Valera, J. Hoffmann.
+
+Unless you are indeed interested in this particular source code, you should refer to the [original DyNet repository](https://github.com/clab/dynet).
+
+# Original README (badges omitted)
+
 <div align="center">
   <img alt="DyNet" src="doc/source/images/dynet_logo.png"><br><br>
 </div>
 
 ---
-
-[![Build Status (Travis CI)](https://travis-ci.org/clab/dynet.svg?branch=master)](https://travis-ci.org/clab/dynet)
-[![Build Status (AppVeyor)](https://ci.appveyor.com/api/projects/status/github/clab/dynet?svg=true)](https://ci.appveyor.com/project/danielh/dynet-c3iuq)
-[![Build Status (Docs)](https://readthedocs.org/projects/dynet/badge/?version=latest)](http://dynet.readthedocs.io/en/latest/)
-[![PyPI version](https://badge.fury.io/py/dyNET.svg)](https://badge.fury.io/py/dyNET)
 
 The Dynamic Neural Network Toolkit
 
