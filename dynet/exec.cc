@@ -1,3 +1,10 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
 #include "dynet/exec.h"
 
 #include <unordered_map>

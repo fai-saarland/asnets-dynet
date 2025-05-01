@@ -1,3 +1,10 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
 #ifndef DYNET_XFUNCTORS_H
 #define DYNET_XFUNCTORS_H
 

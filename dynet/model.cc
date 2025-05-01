@@ -1,3 +1,11 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
+
 #include "dynet/model.h"
 #include "dynet/tensor.h"
 #include "dynet/tensor-eigen.h"

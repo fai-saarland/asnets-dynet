@@ -1,3 +1,10 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
 #include "dynet/init.h"
 
 #include "dynet/aligned-mem-pool.h"

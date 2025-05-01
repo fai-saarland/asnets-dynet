@@ -1,3 +1,10 @@
+####################################
+#
+# FILE WAS MODIFIED FOR ASNETS
+#
+####################################
+
+
 # ########## dynet library ##########
 # Sources:
 set(dynet_library_SRCS

@@ -1,3 +1,11 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
+
 #ifndef DYNET_DEVICE_STRUCTS_H
 #define DYNET_DEVICE_STRUCTS_H
 

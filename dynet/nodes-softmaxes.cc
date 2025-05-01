@@ -1,3 +1,10 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
 #include "dynet/tensor-eigen.h"
 #include "dynet/nodes-softmaxes.h"
 

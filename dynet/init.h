@@ -1,3 +1,10 @@
+///////////////////////////////////
+//
+//  FILE WAS MODIFIED FOR ASNETS
+//
+///////////////////////////////////
+
+
 #ifndef DYNET_EIGEN_INIT_H
 #define DYNET_EIGEN_INIT_H
 
